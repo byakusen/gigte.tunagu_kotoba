@@ -53,9 +53,9 @@ h1{margin:0;font-size:clamp(1.5rem,3vw,2.1rem);font-weight:800;line-height:1.2}
 h1 .d{color:var(--blue)}h1 .s{color:var(--orange)}h1 .r{color:var(--green)}
 
 /* タブ */
-.tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.tabs{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
 .tab{border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  border-radius:16px;padding:8px 10px;font-size:1.05rem;font-weight:800;text-align:center;
+  border-radius:16px;padding:8px 6px;font-size:clamp(.85rem,1.2vw,1.05rem);font-weight:800;text-align:center;
   box-shadow:0 4px 14px rgba(40,60,80,.08);transition:transform .2s,background .2s,box-shadow .2s}
 .tab small{display:block;font-size:.72rem;font-weight:500;color:var(--ink-soft)}
 .tab:hover{transform:translateY(-2px)}
@@ -193,6 +193,24 @@ h1 .d{color:var(--blue)}h1 .s{color:var(--orange)}h1 .r{color:var(--green)}
 .slot .crow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
 .slot .crow .btn{font-size:.95rem;padding:7px 14px}
 
+/* ⑥ 言葉の練習（テストの形：合うほうに○） */
+.drill{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+.dgrid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(min-content,1fr);gap:10px;overflow:auto}
+.dq{background:var(--glass-strong);border-radius:16px;padding:8px 16px;display:flex;align-items:center;gap:12px;border:3px solid transparent;transition:border-color .2s,background .2s}
+.dq.done{cursor:pointer}
+.dq.ok{border-color:var(--green)}
+.dq.ng{border-color:var(--red);background:#fff5f5}
+.dq .dn{flex:none;width:1.9em;height:1.9em;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;display:grid;place-items:center;font-size:.95rem}
+.dq .dt{flex:1;min-width:0;font-size:clamp(1rem,1.45vw,1.3rem);font-weight:700;line-height:1.7}
+.dq .dm{flex:none;width:1.2em;text-align:center;font-size:1.8rem;font-weight:800;line-height:1}
+.dq .dm.ok{color:var(--green)}.dq .dm.ng{color:var(--red)}
+.pick{display:inline-flex;flex-direction:column;vertical-align:middle;gap:2px;margin:0 4px;padding:2px 6px;border-left:3px solid var(--ink-soft);border-right:3px solid var(--ink-soft);border-radius:14px}
+.pick button{border:3px solid transparent;background:transparent;border-radius:999px;padding:0 10px;font-weight:800;font-size:inherit;line-height:1.5;transition:border-color .2s,background .2s}
+.pick button:hover:not(:disabled){background:rgba(255,255,255,.95)}
+.pick button.sel{border-color:var(--red)}
+.pick button.ans{background:var(--green-bg);color:var(--green)}
+.pick button:disabled{cursor:default;pointer-events:none}
+
 /* 重要語句（ひな形1と同じつくり：12まいずつ） */
 .wdocs{flex:1;display:grid;grid-template-columns:1.6fr 1fr;gap:.55rem;min-height:0}
 .wboard{position:relative;background:var(--wcard);border:1px solid var(--wline);border-radius:14px;padding:.5rem;
@@ -260,6 +278,8 @@ h1 .d{color:var(--blue)}h1 .s{color:var(--orange)}h1 .r{color:var(--green)}
   .made{overflow:visible}
   .opts{gap:8px}
   .opt{padding:12px 4px}
+  .drill{flex:none}
+  .dgrid{grid-template-columns:1fr;flex:none;overflow:visible}
   .wdocs{grid-template-columns:1fr;grid-template-rows:minmax(420px,1.9fr) auto;flex:none}
   .wgrid{grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr))}
 }
@@ -285,7 +305,8 @@ h1 .d{color:var(--blue)}h1 .s{color:var(--orange)}h1 .r{color:var(--green)}
     <button class="tab" role="tab" id="t2" aria-selected="false">③ 書きかえよう<small>一つの文 ⇄ 二つの文</small></button>
     <button class="tab" role="tab" id="t3" aria-selected="false">④ なかま分け<small>にた言葉をさがす</small></button>
     <button class="tab" role="tab" id="t4" aria-selected="false">⑤ 続きを考えよう<small>じぶんで文をつくる</small></button>
-    <button class="tab word" role="tab" id="t5" aria-selected="false">重要語句<small>ことばのいみ</small></button>
+    <button class="tab" role="tab" id="t5" aria-selected="false">⑥ 言葉の練習<small>合うほうに○をつける</small></button>
+    <button class="tab word" role="tab" id="t6" aria-selected="false">重要語句<small>ことばのいみ</small></button>
   </nav>
   <main class="panel" id="panel"></main>
 </div>
@@ -634,6 +655,66 @@ function confirmMade(){
 }
 function esc(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));}
 
+/* ===== ⑥ 言葉の練習（テストの形：文に合う言葉のほうに○） ===== */
+const DRILL=[
+  {pre:'兄は野球が得意だ。',post:'水泳も得意だ。',o:['それに','しかし'],a:'それに',
+   e:'野球に、水泳「<b>も</b>」得意なことをつけ加えているので「それに」。'},
+  {pre:'外は大雨だった。',post:'遠足は中止になった。',o:['それに','だから'],a:'だから',
+   e:'大雨（理由）→ 中止（けっか）なので「だから」。'},
+  {pre:'図書館に本を返しに行った',post:'休館日だった。',o:['し','が'],a:'が',
+   e:'返せると思って行ったのに、休館日だった。反対のことなので「が」。'},
+  {pre:'毎日練習した。',post:'うまくひけなかった。',o:['しかし','だから'],a:'しかし',
+   e:'練習したなら「うまくひけそう」と思うのに、ひけなかった。反対のことなので「しかし」。'},
+  {pre:'熱が出た',post:'学校を休んだ。',o:['が','から'],a:'から',
+   e:'熱が出た（理由）→ 学校を休んだ（けっか）なので「から」。'},
+  {pre:'この公園は広い',post:'遊具もたくさんある。',o:['が','し'],a:'し',
+   e:'広いことに、遊具「<b>も</b>」たくさんあることをつけ加えているので「し」。'},
+  {pre:'このりんごは大きい。',post:'とてもあまい。',o:['それに','だから'],a:'それに',
+   e:'大きいことに、あまいことをつけ加えているので「それに」。'},
+  {pre:'急いで駅に向かった',post:'電車に乗れなかった。',o:['から','が'],a:'が',
+   e:'間に合うと思って急いだのに、乗れなかった。反対のことなので「が」。'}
+];
+let dSel=[], dDone=false, dMsg='';
+function drillReset(){dSel=DRILL.map(()=>null);dDone=false;dMsg='文に合う言葉のほうをおして、○をつけよう。ぜんぶえらんだら「答え合わせ」をおそう。';}
+drillReset();
+function renderDrill(){
+  const left=dSel.some(v=>v===null);
+  panel.innerHTML=`
+    <div class="drill">
+      <div class="bar">
+        <div class="lead">文に合う言葉のほうに、○をつけよう。</div>
+        <button class="btn main" id="dCheck" ${left||dDone?'disabled style="opacity:.45;cursor:default"':''}>答え合わせ</button>
+        <button class="btn" id="dReset">もう一度</button>
+      </div>
+      <div class="sortmsg" id="dmsg">${dMsg}</div>
+      <div class="dgrid">${DRILL.map((q,i)=>{
+        const ok=dSel[i]===q.a;
+        const pick=`<span class="pick">${q.o.map(o=>`<button class="${dSel[i]===o?'sel':''}${dDone&&o===q.a?' ans':''}" data-i="${i}" data-o="${o}" ${dDone?'disabled':''}>${o}</button>`).join('')}</span>`;
+        return `<div class="dq ${dDone?'done '+(ok?'ok':'ng'):''}" data-i="${i}"><span class="dn">${i+1}</span><div class="dt">${q.pre}${pick}、${q.post}</div>${dDone?`<span class="dm ${ok?'ok':'ng'}">${ok?'◯':'✕'}</span>`:''}</div>`;}).join('')}</div>
+    </div>`;
+  panel.querySelectorAll('.pick button').forEach(b=>b.onclick=()=>{
+    if(dDone)return;
+    dSel[+b.dataset.i]=b.dataset.o;
+    b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b));
+    if(dSel.every(v=>v!==null)){const c=$('#dCheck');c.disabled=false;c.removeAttribute('style');}
+  });
+  panel.querySelectorAll('.dq').forEach(d=>d.onclick=()=>{
+    if(!dDone)return;
+    const i=+d.dataset.i, q=DRILL[i], ok=dSel[i]===q.a;
+    dMsg=`${i+1}　${ok?'':'正しくは「<b>'+q.a+'</b>」。'}${q.e}`;
+    $('#dmsg').innerHTML=dMsg;
+  });
+  $('#dCheck').onclick=()=>{
+    if(dDone||dSel.some(v=>v===null))return;
+    dDone=true;
+    const n=DRILL.filter((q,i)=>dSel[i]===q.a).length, all=DRILL.length;
+    dMsg=n===all?`ぜんぶ正解！ ${n} / ${all}　文をおすと、説明が見られるよ。`:`${n} / ${all} 正解。✕の文をおして、説明を読んでたしかめよう。`;
+    n===all?(pinpon(),setTimeout(party,150)):bubu();
+    renderDrill();
+  };
+  $('#dReset').onclick=()=>{drillReset();renderDrill();};
+}
+
 /* ===== 重要語句（ひな形1と同じ書き方） =====
    説明文：[漢字:よみ] でふりがな、{ … } で赤い太字、「。」ごとに行が分かれる。
    r:'' で語句のふりがななし、rb:'日差' で語句の頭の字だけにふりがな。 */
@@ -764,7 +845,7 @@ function renderWords(){
 }
 
 /* ===== タブ ===== */
-const VIEWS=[renderLearn,renderQuiz,renderConv,renderSort,renderBuild,renderWords];
+const VIEWS=[renderLearn,renderQuiz,renderConv,renderSort,renderBuild,renderDrill,renderWords];
 const tabs=[...document.querySelectorAll('.tab')];
 tabs.forEach((t,i)=>t.onclick=()=>{
   ac();
