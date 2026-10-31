@@ -64,7 +64,11 @@ h1 .d{color:var(--blue)}h1 .s{color:var(--orange)}h1 .r{color:var(--green)}
 .tab.word small{color:var(--gl-ink)}
 .tab.word[aria-selected="true"]{background:var(--gl);color:#fff}
 .tab.word[aria-selected="true"] small{color:#fff}
-.tab:not(.word)[aria-selected="true"]::after{content:"";display:block;height:4px;border-radius:4px;margin:5px auto 0;width:40%;
+.tab.prac{background:#FDEDF2;color:#B23A62}
+.tab.prac small{color:#B23A62}
+.tab.prac[aria-selected="true"]{background:#D2527E;color:#fff}
+.tab.prac[aria-selected="true"] small{color:#fff}
+.tab:not(.word):not(.prac)[aria-selected="true"]::after{content:"";display:block;height:4px;border-radius:4px;margin:5px auto 0;width:40%;
   background:linear-gradient(90deg,var(--blue),var(--orange),var(--green))}
 
 /* パネル */
@@ -305,7 +309,7 @@ h1 .d{color:var(--blue)}h1 .s{color:var(--orange)}h1 .r{color:var(--green)}
     <button class="tab" role="tab" id="t2" aria-selected="false">③ 書きかえよう<small>一つの文 ⇄ 二つの文</small></button>
     <button class="tab" role="tab" id="t3" aria-selected="false">④ なかま分け<small>にた言葉をさがす</small></button>
     <button class="tab" role="tab" id="t4" aria-selected="false">⑤ 続きを考えよう<small>じぶんで文をつくる</small></button>
-    <button class="tab" role="tab" id="t5" aria-selected="false">⑥ 言葉の練習<small>合うほうに○をつける</small></button>
+    <button class="tab prac" role="tab" id="t5" aria-selected="false">⑥ 言葉の練習<small>合うほうに○をつける</small></button>
     <button class="tab word" role="tab" id="t6" aria-selected="false">重要語句<small>ことばのいみ</small></button>
   </nav>
   <main class="panel" id="panel"></main>
